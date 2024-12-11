@@ -1,11 +1,13 @@
 import React, { Component, createRef } from 'react';
 import ChildComponent from './ChildComponent';
+import FunctionalList from './FunctionalList';
 
 class ParentComponent extends Component {
     constructor(props) {
         super(props);
         this.state = {
             inputValue: '',
+            isButtonDisabled: false,
         };
         this.inputRef = createRef();
         console.log('[ParentComponent] constructor');
@@ -30,8 +32,11 @@ class ParentComponent extends Component {
 
     handleInputChange = (e) => {
         const value = e.target.value;
+        const reactValues = ['react', 'реакт']
+        const containsReact = reactValues.some(e => value.toLowerCase().includes(e));
         this.setState({
             inputValue: value,
+            isButtonDisabled: containsReact,
         });
     }
 
@@ -40,12 +45,19 @@ class ParentComponent extends Component {
         console.log('Форма отправлена со значением:', this.state.inputValue);
         this.setState({
             inputValue: '',
+            isButtonDisabled: false,
         });
+    }
+
+    focusInput = () => {
+        if (this.inputRef.current) {
+            this.inputRef.current.focus();
+        }
     }
 
     render() {
         console.log('[ParentComponent] render');
-        const { inputValue } = this.state;
+        const { inputValue, isButtonDisabled } = this.state;
 
         const childStringProp = "Hello, World!";
         const childNumberProp = 7;
@@ -64,15 +76,19 @@ class ParentComponent extends Component {
                             ref={this.inputRef}
                         />
                     </label>
-                    <button type="submit">Отправить</button>
+                    <button type="submit" disabled={isButtonDisabled}>Отправить</button>
                 </form>
+                <button onClick={this.focusInput}>Выставить фокус в инпут</button>
 
-                <ChildComponent
-                    stringProp={childStringProp}
-                    numberProp={childNumberProp}
-                    objectProp={childObjectProp}
-                    functionProp={childFunctionProp}
-                />
+                <> {/* Сокращенная форма записи React.Fragment */}
+                    <ChildComponent
+                        stringProp={childStringProp}
+                        numberProp={childNumberProp}
+                        objectProp={childObjectProp}
+                        functionProp={childFunctionProp}
+                    />
+                    <FunctionalList />
+                </>
             </div>
         );
     }
